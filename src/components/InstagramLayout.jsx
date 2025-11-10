@@ -592,9 +592,8 @@ const InstagramLayout = () => {
       if (uploadType === 'reel' && fileType === 'video') {
         console.log('🎥 Starting reel database save...')
         
-        // Ensure user is authenticated
-        const { session, error: sessionError } = await nhost.auth.getSession()
-        if (sessionError) throw sessionError
+        // Ensure user is authenticated (v2 syntax)
+        const session = await nhost.auth.getSessionAsync()
         if (!session?.user) throw new Error('User not logged in')
         
         const user_id = session.user.id
