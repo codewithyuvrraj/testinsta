@@ -591,8 +591,8 @@ const InstagramLayout = () => {
       // Save to database if it's a reel
       if (uploadType === 'reel' && fileType === 'video') {
         const mutation = `
-          mutation insertReel($url: String!, $caption: String!) {
-            insert_reels_one(object: { video_url: $url, caption: $caption }) {
+          mutation InsertReel($video_url: String!, $caption: String, $user_id: uuid!) {
+            insert_reels_one(object: { video_url: $video_url, caption: $caption, user_id: $user_id }) {
               id
               video_url
               created_at
@@ -602,7 +602,11 @@ const InstagramLayout = () => {
         
         await nhost.graphql.request({
           query: mutation,
-          variables: { url: cloudinaryUrl, caption: uploadData.caption }
+          variables: { 
+            video_url: cloudinaryUrl, 
+            caption: uploadData.caption,
+            user_id: currentUser?.id
+          }
         })
       }
       
