@@ -1,6 +1,6 @@
-import { createClient } from '@nhost/nhost-js'
+import { NhostClient } from '@nhost/nhost-js'
 
-export const nhost = createClient({
+export const nhost = new NhostClient({
   subdomain: 'ofafvhtbuhvvkhuprotc',
   region: 'ap-southeast-1'
 })
