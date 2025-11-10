@@ -592,16 +592,29 @@ const InstagramLayout = () => {
       if (uploadType === 'reel' && fileType === 'video') {
         console.log('🎥 Starting reel database save...')
         
-        // Ensure user is authenticated (v2 syntax)
-        const session = await nhost.auth.getSessionAsync()
-        if (!session?.user) throw new Error('User not logged in')
+        // Correct way to get session (v2)
+        const session = await nhost.auth.getSession()
         
-        const user_id = session.user.id
+        if (!session) {
+          console.error('❌ No active session — user not logged in.')
+          throw new Error('User not logged in')
+        }
+        
+        const user_id = session.user?.id
+        if (!user_id) {
+          console.error('❌ User ID missing in session.')
+          throw new Error('User ID missing')
+        }
+        
         console.log('👤 Logged-in user:', user_id)
         
-        const mutation = `
+        const query = `
           mutation InsertReel($video_url: String!, $caption: String, $user_id: uuid!) {
-            insert_reels_one(object: { video_url: $video_url, caption: $caption, user_id: $user_id }) {
+            insert_reels_one(object: {
+              video_url: $video_url,
+              caption: $caption,
+              user_id: $user_id
+            }) {
               id
               video_url
               created_at
@@ -615,14 +628,8 @@ const InstagramLayout = () => {
           user_id
         }
         
-        console.log('🔍 Debug Variables:', variables)
-        
-        const { data, error } = await nhost.graphql.request({ query: mutation, variables })
-        
-        if (error) {
-          console.error('❌ GraphQL Error:', error)
-          throw error
-        }
+        const { data, error } = await nhost.graphql.request(query, variables)
+        if (error) throw error
         
         console.log('✅ Reel saved in database:', data.insert_reels_one)
       }
