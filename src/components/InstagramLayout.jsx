@@ -592,11 +592,13 @@ const InstagramLayout = () => {
       if (uploadType === 'reel' && fileType === 'video') {
         console.log('🎥 Starting reel database save...')
         
-        // Check authentication
-        const user = nhost.auth.getUser()
-        if (!user) {
-          throw new Error('User not logged in. Please sign in first.')
-        }
+        // Ensure user is authenticated
+        const { session, error: sessionError } = await nhost.auth.getSession()
+        if (sessionError) throw sessionError
+        if (!session?.user) throw new Error('User not logged in')
+        
+        const user_id = session.user.id
+        console.log('👤 Logged-in user:', user_id)
         
         const mutation = `
           mutation InsertReel($video_url: String!, $caption: String, $user_id: uuid!) {
@@ -611,15 +613,12 @@ const InstagramLayout = () => {
         const variables = {
           video_url: cloudinaryUrl,
           caption: uploadData.caption || '',
-          user_id: user.id
+          user_id
         }
         
         console.log('🔍 Debug Variables:', variables)
         
-        const { data, error } = await nhost.graphql.request({
-          query: mutation,
-          variables
-        })
+        const { data, error } = await nhost.graphql.request({ query: mutation, variables })
         
         if (error) {
           console.error('❌ GraphQL Error:', error)
