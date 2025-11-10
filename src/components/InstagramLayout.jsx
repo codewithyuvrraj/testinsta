@@ -590,6 +590,10 @@ const InstagramLayout = () => {
       
       // Save to database if it's a reel
       if (uploadType === 'reel' && fileType === 'video') {
+        // Get the current user session
+        const { user } = nhost.auth.getSession()
+        if (!user?.id) throw new Error('User not logged in')
+        
         const query = `
           mutation InsertReel($video_url: String!, $caption: String, $user_id: uuid!) {
             insert_reels_one(object: { video_url: $video_url, caption: $caption, user_id: $user_id }) {
@@ -602,24 +606,16 @@ const InstagramLayout = () => {
         
         const variables = {
           video_url: cloudinaryUrl,
-          caption: uploadData.caption,
-          user_id: currentUser?.id
+          caption: uploadData.caption || '',
+          user_id: user.id
         }
         
-        console.log('🔍 Debug Query:', query)
         console.log('🔍 Debug Variables:', variables)
         
-        const { data, error } = await nhost.graphql.request({
-          query,
-          variables
-        })
+        const { data, error } = await nhost.graphql.request({ query, variables })
+        if (error) throw error
         
-        if (error) {
-          console.error('❌ GraphQL error:', error)
-          throw error
-        }
-        
-        console.log('✅ Reel inserted:', data.insert_reels_one)
+        console.log('✅ Reel inserted successfully:', data.insert_reels_one)
       }
       
       // Create new post object with Cloudinary URL
