@@ -606,6 +606,9 @@ const InstagramLayout = () => {
           user_id: currentUser?.id
         }
         
+        console.log('🔍 Debug Query:', query)
+        console.log('🔍 Debug Variables:', variables)
+        
         const { data, error } = await nhost.graphql.request({
           query,
           variables
