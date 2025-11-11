@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { We } from '../lib/nhost'
+import { nhost } from '../lib/nhost'
 import { uploadToCloudinary } from '../lib/cloudinary'
 
 // Clear localStorage to prevent quota errors
@@ -60,8 +60,8 @@ const InstagramLayout = () => {
 
   const loadCurrentUser = async () => {
     try {
-      if (We.auth.isAuthenticated) {
-        const user = We.auth.getUser()
+      if (nhost.auth.isAuthenticated) {
+        const user = nhost.auth.getUser()
         setCurrentUser(user)
       }
     } catch (error) {
@@ -86,7 +86,7 @@ const InstagramLayout = () => {
   }
 
   const handleLogout = async () => {
-    await We.auth.signOut()
+    await nhost.auth.signOut()
     window.location.reload()
   }
 
@@ -593,7 +593,7 @@ const InstagramLayout = () => {
         console.log('🎥 Starting reel database save...')
         
         // Correct for v2
-        const { session, error: sessionError } = await We.auth.getSessionState()
+        const { session, error: sessionError } = await nhost.auth.getSessionState()
         
         if (sessionError) {
           console.error('❌ Session error:', sessionError)
@@ -628,7 +628,7 @@ const InstagramLayout = () => {
           user_id
         }
         
-        const { data, error } = await We.graphql.request(query, variables)
+        const { data, error } = await nhost.graphql.request(query, variables)
         if (error) throw error
         
         console.log('✅ Reel saved in database:', data.insert_reels_one)
