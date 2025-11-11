@@ -593,7 +593,7 @@ const InstagramLayout = () => {
         console.log('🎥 Starting reel database save...')
         
         // Correct way to get session (v2)
-        const session = await nhost.auth.getSession()
+        const session = await nhost.auth.getSessionAsync()
         
         if (!session) {
           console.error('❌ No active session — user not logged in.')
