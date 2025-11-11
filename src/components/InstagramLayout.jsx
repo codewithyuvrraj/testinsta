@@ -592,18 +592,18 @@ const InstagramLayout = () => {
       if (uploadType === 'reel' && fileType === 'video') {
         console.log('🎥 Starting reel database save...')
         
-        // Correct way to get session (v2)
-        const session = await We.auth.getSessionAsync()
+        // Correct for v2
+        const { session, error: sessionError } = await We.auth.getSessionState()
         
-        if (!session) {
-          console.error('❌ No active session — user not logged in.')
-          throw new Error('User not logged in')
+        if (sessionError) {
+          console.error('❌ Session error:', sessionError)
+          throw sessionError
         }
         
-        const user_id = session.user?.id
+        const user_id = session?.user?.id
         if (!user_id) {
-          console.error('❌ User ID missing in session.')
-          throw new Error('User ID missing')
+          console.error('❌ User not logged in')
+          throw new Error('User not logged in')
         }
         
         console.log('👤 Logged-in user:', user_id)
