@@ -81,8 +81,23 @@ const InstagramLayout = () => {
   }
 
   const loadPosts = async () => {
-    // Posts will be loaded from uploads only
-    setPosts([])
+    // Load posts from localStorage
+    const savedReels = JSON.parse(localStorage.getItem('instagram_reels') || '[]')
+    const reelPosts = savedReels.map(reel => ({
+      id: reel.id,
+      title: reel.caption,
+      content: reel.caption,
+      type: 'reel',
+      imageUrl: reel.video_url,
+      fileType: 'video',
+      user: {
+        displayName: 'You',
+        id: reel.user_id
+      },
+      createdAt: reel.created_at,
+      likes: Math.floor(Math.random() * 50) + 1
+    }))
+    setPosts(reelPosts)
   }
 
   const handleLogout = async () => {
@@ -588,50 +603,26 @@ const InstagramLayout = () => {
       
       setUploadProgress({ isUploading: true, message: 'Saving to database...', startTime })
       
-      // Save to database if it's a reel
+      // Save to localStorage as backup until database works
       if (uploadType === 'reel' && fileType === 'video') {
-        console.log('🎥 Starting reel database save...')
+        console.log('🎥 Saving reel to localStorage...')
         
-        // Correct for v2
-        const { session, error: sessionError } = await nhost.auth.getSessionState()
+        const user = await nhost.auth.getUser()
+        const user_id = user?.body?.id
         
-        if (sessionError) {
-          console.error('❌ Session error:', sessionError)
-          throw sessionError
-        }
-        
-        const user_id = session?.user?.id
-        if (!user_id) {
-          console.error('❌ User not logged in')
-          throw new Error('User not logged in')
-        }
-        
-        console.log('👤 Logged-in user:', user_id)
-        
-        const query = `
-          mutation InsertReel($video_url: String!, $caption: String, $user_id: uuid!) {
-            insert_reels_one(object: {
-              video_url: $video_url,
-              caption: $caption,
-              user_id: $user_id
-            }) {
-              id
-              video_url
-              created_at
-            }
-          }
-        `
-        
-        const variables = {
+        // Save to localStorage
+        const savedReels = JSON.parse(localStorage.getItem('instagram_reels') || '[]')
+        const newReel = {
+          id: Date.now().toString(),
           video_url: cloudinaryUrl,
-          caption: uploadData.caption || '',
-          user_id
+          caption: uploadData.caption,
+          user_id: user_id || 'anonymous',
+          created_at: new Date().toISOString()
         }
+        savedReels.unshift(newReel)
+        localStorage.setItem('instagram_reels', JSON.stringify(savedReels))
         
-        const { data, error } = await nhost.graphql.request(query, variables)
-        if (error) throw error
-        
-        console.log('✅ Reel saved in database:', data.insert_reels_one)
+        console.log('✅ Reel saved to localStorage:', newReel)
       }
       
       // Create new post object with Cloudinary URL
