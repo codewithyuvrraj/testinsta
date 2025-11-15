@@ -20,6 +20,19 @@ if (typeof window !== 'undefined') {
       50% { opacity: 0.8; transform: scale(1.02); }
       100% { opacity: 1; transform: scale(1); }
     }
+    
+    /* Instagram-like responsive images */
+    @media (max-width: 768px) {
+      .post-image, .post-video {
+        max-height: 50vh !important;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .post-image, .post-video {
+        max-height: 40vh !important;
+      }
+    }
   `
   document.head.appendChild(style)
 }
@@ -2201,7 +2214,7 @@ const InstagramLayout = () => {
             </div>
 
             {/* Posts */}
-            <div style={{ paddingBottom: '2rem' }}>
+            <div style={{ paddingBottom: '2rem', maxWidth: '600px', margin: '0 auto' }}>
               {posts.length > 0 ? posts.map((post, i) => {
                 const postId = post.id || i
                 const isLiked = likedPosts.has(postId)
@@ -2488,7 +2501,7 @@ const InstagramLayout = () => {
                         </div>
                       </div>
                     </div>
-                    <div style={{ background: !post.imageUrl ? 'rgba(212, 175, 55, 0.1)' : '#000', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#D4AF37', position: 'relative' }}>
+                    <div style={{ background: !post.imageUrl ? 'rgba(212, 175, 55, 0.1)' : '#000', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#D4AF37', position: 'relative', minHeight: '200px', maxHeight: '60vh' }}>
                       {(() => {
                         // Parse image URL for feed display
                         let feedImageUrl = post.imageUrl
@@ -2510,14 +2523,14 @@ const InstagramLayout = () => {
                         return feedImageUrl ? (
                           (Array.isArray(feedImageUrl) && isFeedGallery) ? (
                             // Gallery post with multiple images
-                            <div style={{ width: '100%', height: '400px', position: 'relative', overflow: 'hidden' }}>
+                            <div style={{ width: '100%', height: 'auto', position: 'relative' }}>
                               <div 
                                 style={{
                                   display: 'flex',
                                   transform: `translateX(-${(currentPostImageIndex[postId] || 0) * 100}%)`,
                                   transition: 'transform 0.3s ease',
                                   width: '100%',
-                                  height: '100%'
+                                  height: 'auto'
                                 }}
                                 onTouchStart={(e) => {
                                   e.currentTarget.startX = e.touches[0].clientX
@@ -2541,7 +2554,8 @@ const InstagramLayout = () => {
                                   <img 
                                     key={index}
                                     src={url} 
-                                    style={{ width: '100%', height: '400px', objectFit: 'cover', flexShrink: 0, background: '#000', margin: '0 auto', display: 'block' }}
+                                    className="post-image"
+                                    style={{ width: '100%', height: 'auto', maxHeight: '60vh', maxWidth: '100%', objectFit: 'contain', flexShrink: 0, background: '#000', margin: '0 auto', display: 'block' }}
                                     alt={`${post.title} - ${index + 1}`}
                                     onError={(e) => {
                                       console.log('Feed gallery image failed to load:', url)
@@ -2642,7 +2656,8 @@ const InstagramLayout = () => {
                             post.fileType === 'video' ? (
                               <video 
                                 src={Array.isArray(feedImageUrl) ? feedImageUrl[0] : feedImageUrl} 
-                                style={{ width: '100%', height: '400px', objectFit: 'cover' }} 
+                                className="post-video"
+                                style={{ width: '100%', height: 'auto', maxHeight: '60vh', maxWidth: '100%', objectFit: 'contain' }} 
                                 controls
                                 onClick={(e) => {
                                   const video = e.target
@@ -2659,7 +2674,8 @@ const InstagramLayout = () => {
                             ) : (
                               <img 
                                 src={Array.isArray(feedImageUrl) ? feedImageUrl[0] : feedImageUrl} 
-                                style={{ width: '100%', height: '400px', objectFit: 'cover', background: '#000', display: 'block', margin: '0 auto' }} 
+                                className="post-image"
+                                style={{ width: '100%', height: 'auto', maxHeight: '60vh', maxWidth: '100%', objectFit: 'contain', background: '#000', display: 'block', margin: '0 auto' }} 
                                 alt={post.title}
                                 onError={(e) => {
                                   console.log('Feed image failed to load:', Array.isArray(feedImageUrl) ? feedImageUrl[0] : feedImageUrl)
