@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Instagram Clone</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Roboto', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+        }
+        
+        .auth-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 2rem;
+            width: 100%;
+            max-width: 400px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .logo {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .logo h1 {
+            font-size: 2rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 0.5rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            color: #ffffff;
+            font-size: 1rem;
+        }
+        
+        .form-group input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 0.75rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 1rem;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .toggle-form {
+            text-align: center;
+            margin-top: 1rem;
+        }
+        
+        .toggle-form a {
+            color: #ffffff;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .toggle-form a:hover {
+            text-decoration: underline;
+        }
+        
+        .error {
+            background: rgba(255, 71, 87, 0.2);
+            border: 1px solid rgba(255, 71, 87, 0.5);
+            color: #ff4757;
+            padding: 0.75rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+        
+        .success {
+            background: rgba(76, 175, 80, 0.2);
+            border: 1px solid rgba(76, 175, 80, 0.5);
+            color: #4CAF50;
+            padding: 0.75rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+    </style>
+    
+    <script type="module">
+        import { NhostClient } from "https://esm.sh/@nhost/nhost-js";
+
+        const nhost = new NhostClient({
+            subdomain: "ofafvhtbuhvvkhuprotc",
+            region: "eu-central-1"
+        });
+
+        window.nhost = nhost;
+        console.log('✅ Nhost auth client ready');
+    </script>
+</head>
+<body>
+    <div class="auth-container">
+        <div class="logo">
+            <h1>Instagram Clone</h1>
+            <p>Connect with friends and share your moments</p>
+        </div>
+        
+        <div id="error-message" class="error" style="display: none;"></div>
+        <div id="success-message" class="success" style="display: none;"></div>
+        
+        <!-- Login Form -->
+        <form id="loginForm" style="display: block;">
+            <div class="form-group">
+                <label for="loginEmail">Email</label>
+                <input type="email" id="loginEmail" placeholder="Enter your email" required>
+            </div>
+            <div class="form-group">
+                <label for="loginPassword">Password</label>
+                <input type="password" id="loginPassword" placeholder="Enter your password" required>
+            </div>
+            <button type="submit" class="btn" id="loginBtn">Sign In</button>
+            <div class="toggle-form">
+                <p>Don't have an account? <a href="#" onclick="toggleForm('signup')">Sign up</a></p>
+            </div>
+        </form>
+        
+        <!-- Signup Form -->
+        <form id="signupForm" style="display: none;">
+            <div class="form-group">
+                <label for="signupEmail">Email</label>
+                <input type="email" id="signupEmail" placeholder="Enter your email" required>
+            </div>
+            <div class="form-group">
+                <label for="signupPassword">Password</label>
+                <input type="password" id="signupPassword" placeholder="Create a password" required>
+            </div>
+            <div class="form-group">
+                <label for="signupUsername">Username</label>
+                <input type="text" id="signupUsername" placeholder="Choose a username" required>
+            </div>
+            <button type="submit" class="btn" id="signupBtn">Sign Up</button>
+            <div class="toggle-form">
+                <p>Already have an account? <a href="#" onclick="toggleForm('login')">Sign in</a></p>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        function showError(message) {
+            const errorEl = document.getElementById('error-message');
+            const successEl = document.getElementById('success-message');
+            errorEl.textContent = message;
+            errorEl.style.display = 'block';
+            successEl.style.display = 'none';
+        }
+
+        function showSuccess(message) {
+            const errorEl = document.getElementById('error-message');
+            const successEl = document.getElementById('success-message');
+            successEl.textContent = message;
+            successEl.style.display = 'block';
+            errorEl.style.display = 'none';
+        }
+
+        function hideMessages() {
+            document.getElementById('error-message').style.display = 'none';
+            document.getElementById('success-message').style.display = 'none';
+        }
+
+        function toggleForm(formType) {
+            hideMessages();
+            const loginForm = document.getElementById('loginForm');
+            const signupForm = document.getElementById('signupForm');
+            
+            if (formType === 'signup') {
+                loginForm.style.display = 'none';
+                signupForm.style.display = 'block';
+            } else {
+                loginForm.style.display = 'block';
+                signupForm.style.display = 'none';
+            }
+        }
+
+        // Check if user is already logged in
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.nhost && window.nhost.auth.getUser()) {
+                window.location.href = 'index.html';
+            }
+        });
+
+        // Login form handler
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            const loginBtn = document.getElementById('loginBtn');
+            
+            loginBtn.disabled = true;
+            loginBtn.textContent = 'Signing in...';
+            hideMessages();
+            
+            try {
+                const { session, error } = await window.nhost.auth.signIn({
+                    email: email,
+                    password: password
+                });
+                
+                if (error) {
+                    throw new Error(error.message);
+                }
+                
+                if (session) {
+                    showSuccess('Login successful! Redirecting...');
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 1000);
+                } else {
+                    throw new Error('Login failed. Please try again.');
+                }
+                
+            } catch (error) {
+                console.error('Login error:', error);
+                showError(error.message || 'Login failed. Please try again.');
+            } finally {
+                loginBtn.disabled = false;
+                loginBtn.textContent = 'Sign In';
+            }
+        });
+
+        // Signup form handler
+        document.getElementById('signupForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('signupEmail').value;
+            const password = document.getElementById('signupPassword').value;
+            const username = document.getElementById('signupUsername').value;
+            const signupBtn = document.getElementById('signupBtn');
+            
+            signupBtn.disabled = true;
+            signupBtn.textContent = 'Creating account...';
+            hideMessages();
+            
+            try {
+                const { session, error } = await window.nhost.auth.signUp({
+                    email: email,
+                    password: password,
+                    options: {
+                        displayName: username,
+                        metadata: {
+                            username: username
+                        }
+                    }
+                });
+                
+                if (error) {
+                    throw new Error(error.message);
+                }
+                
+                if (session) {
+                    showSuccess('Account created successfully! Redirecting...');
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 1000);
+                } else {
+                    showSuccess('Account created! Please check your email to verify your account.');
+                    setTimeout(() => {
+                        toggleForm('login');
+                    }, 2000);
+                }
+                
+            } catch (error) {
+                console.error('Signup error:', error);
+                showError(error.message || 'Signup failed. Please try again.');
+            } finally {
+                signupBtn.disabled = false;
+                signupBtn.textContent = 'Sign Up';
+            }
+        });
+    </script>
+</body>
+</html>
